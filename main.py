@@ -8,6 +8,9 @@ import gpxpy
 # Minimum speed threshold (below this and we're in pain).
 PAIN = 7.0  # kph
 
+# Maximum speed threshold (above this and we don't pedal).
+FREE = 45.0 # kph
+
 # These numbers are from nowhereland. :)
 POWER = 120  # watts
 WEIGHT = 80  # kg (bike + rider)
@@ -34,6 +37,9 @@ for track in gpx.tracks:
 
     # Pain estimate for whole track (time at min speed).
     pain = 0
+
+    # Freewheel estimate for whole track (time spent at max speed).
+    free = 0
 
     for segment in track.segments:
         for i, pnt in enumerate(segment.points[:-1]):
@@ -67,7 +73,7 @@ for track in gpx.tracks:
                 else:
                     hi = mid
 
-            velocity = max(PAIN, 3.6 * lo)
+            velocity = max(PAIN, min(FREE, 3.6 * lo))
 
             # Update track stats.
             distance += hyp
@@ -75,6 +81,7 @@ for track in gpx.tracks:
             duration = 3.6 * hyp / velocity
             estimate += duration
             pain += duration * (velocity == PAIN)
+            free += duration * (velocity == FREE)
 
     print(f'distance: {distance / 1000:.2f}km')
 
@@ -82,7 +89,10 @@ for track in gpx.tracks:
     print(f'time: {int(h):02}h{int(m):02}m')
 
     h, m = divmod(pain // 60, 60)
-    print(f'pain: {int(h):02}h{int(m):02}m')
+    print(f'pain: {int(h):02}h{int(m):02}m ({100 * pain / estimate:.1f}%)')
+
+    h, m = divmod(free // 60, 60)
+    print(f'free: {int(h):02}h{int(m):02}m ({100 * free / estimate:.1f}%)')
 
     # NOTE currently only investigate the first track
     break
