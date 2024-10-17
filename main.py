@@ -9,17 +9,19 @@ import gpxpy
 PAIN = 7.0  # kph
 
 # These numbers are from nowhereland. :)
-POWER = 100  # watts
+POWER = 120  # watts
 WEIGHT = 80  # kg (bike + rider)
-CDA = 0.6
-CRR = 0.006
+CDA = 0.5
+CRR = 0.008
 DTLOSS = 0.05  # fraction
 
 # Other constants.
 G = 9.8067
 RHO = 1.225  # kg/m^3 (air density)
 
-with open('Williams_Lake_to_Bella_Coola.gpx') as fp:
+import sys
+
+with open(sys.argv[1]) as fp:
     gpx = gpxpy.parse(fp)
 
 for track in gpx.tracks:
