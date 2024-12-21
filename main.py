@@ -20,7 +20,7 @@ DTLOSS = 0.05  # fraction
 
 # Other constants.
 G = 9.8067
-RHO = 1.225  # kg/m^3 (air density)
+RHO = 1.225  # kg/m^3 (air density) (also this is not constant...)
 
 import sys
 
