@@ -6,10 +6,16 @@ import geopy.distance
 import gpxpy
 
 # Minimum speed threshold (below this and we're in pain).
-PAIN = 7.0  # kph
+PAIN = 6.0   # kph
+PAIN_LIMIT = 3.0  # PAIN is usually the speed of pedalling in the easiest gear
+                  # at a comfortable cadence, so we can't go much slower.
+                  # However, by artificially allowing slower speeds, we can
+                  # increase the weight of time spent at the lowest gear to
+                  # try to better represent the physical stress of the ride.
+                  # PAIN_LIMIT is the minimum of this artificial speed.
 
 # Maximum speed threshold (above this and we don't pedal).
-FREE = 45.0 # kph
+FREE = 40.0  # kph
 
 # These numbers are from nowhereland. :)
 POWER = 120  # watts
@@ -73,14 +79,14 @@ for track in gpx.tracks:
                 else:
                     hi = mid
 
-            velocity = max(PAIN, min(FREE, 3.6 * lo))
+            velocity = max(PAIN_LIMIT, min(FREE, 3.6 * lo))
 
             # Update track stats.
             distance += hyp
 
             duration = 3.6 * hyp / velocity
             estimate += duration
-            pain += duration * (velocity == PAIN)
+            pain += duration * (velocity <= PAIN)
             free += duration * (velocity == FREE)
 
     print(f'distance: {distance / 1000:.2f}km')
