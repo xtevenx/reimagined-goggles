@@ -47,6 +47,11 @@ for track in gpx.tracks:
     # Freewheel estimate for whole track (time spent at max speed).
     free = 0
 
+    # Time markers to keep myself on track.
+    # Format: [(estimate, distance), ... ]
+    breakpoints = [(estimate, distance)]
+    breakpoint_freq = 3600
+
     for segment in track.segments:
         for i, pnt in enumerate(segment.points[:-1]):
             nxt = segment.points[i + 1]
@@ -89,6 +94,10 @@ for track in gpx.tracks:
             pain += duration * (velocity <= PAIN)
             free += duration * (velocity == FREE)
 
+            # Update breakpoints if required.
+            if estimate >= breakpoints[-1][0] + breakpoint_freq:
+                breakpoints.append((estimate, distance))
+
     print(f'distance: {distance / 1000:.2f}km')
 
     h, m = divmod(estimate // 60, 60)
@@ -99,6 +108,16 @@ for track in gpx.tracks:
 
     h, m = divmod(free // 60, 60)
     print(f'free: {int(h):02}h{int(m):02}m ({100 * free / estimate:.1f}%)')
+
+    print()
+
+    if estimate != breakpoints[-1][0]:
+        breakpoints.append((estimate, distance))
+
+    print('breakpoints:')
+    for t, d in breakpoints[1:]:
+        h, m = divmod(t // 60, 60)
+        print(f'{int(h):02}h{int(m):02}m -- {d / 1000:.2f}km')
 
     # NOTE currently only investigate the first track
     break
