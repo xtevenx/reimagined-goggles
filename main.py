@@ -38,6 +38,10 @@ for track in gpx.tracks:
     # Total distance for the whole track.
     distance = 0
 
+    # Total elevation change for the whole track.
+    elevation_gain = 0
+    elevation_loss = 0
+
     # Time estimate for the whole track.
     estimate = 0
 
@@ -88,6 +92,8 @@ for track in gpx.tracks:
 
             # Update track stats.
             distance += hyp
+            elevation_gain += (rise > 0) * rise
+            elevation_loss -= (rise < 0) * rise
 
             duration = 3.6 * hyp / velocity
             estimate += duration
@@ -99,6 +105,10 @@ for track in gpx.tracks:
                 breakpoints.append((estimate, distance))
 
     print(f'distance: {distance / 1000:.2f}km')
+    print(f'elevation gain: {elevation_gain:.0f}m')
+    print(f'elevation loss: {elevation_loss:.0f}m')
+
+    print()
 
     h, m = divmod(estimate // 60, 60)
     print(f'time: {int(h):02}h{int(m):02}m')
