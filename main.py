@@ -6,7 +6,7 @@ import geopy.distance
 import gpxpy
 
 # Minimum speed threshold (below this and we're in pain).
-PAIN = 6.0   # kph
+PAIN = 6.0  # kph
 PAIN_LIMIT = 3.0  # PAIN is usually the speed of pedalling in the easiest gear
                   # at a comfortable cadence, so we can't go much slower.
                   # However, by artificially allowing slower speeds, we can
@@ -15,18 +15,21 @@ PAIN_LIMIT = 3.0  # PAIN is usually the speed of pedalling in the easiest gear
                   # PAIN_LIMIT is the minimum of this artificial speed.
 
 # Maximum speed threshold (above this and we don't pedal).
-FREE = 40.0  # kph
+FREE = 35.0  # kph
 
 # These numbers are from nowhereland. :)
 POWER = 120  # watts
-WEIGHT = 80  # kg (bike + rider)
-CDA = 0.5
-CRR = 0.008
-DTLOSS = 0.05  # fraction
+WEIGHT = 90  # kg (bike + rider)
+CDA = 0.5    # ???
+CRR = 0.008  # A touring tire with low pressure might have Crr around 0.008.
+             # Some calculations are shown here:
+               # https://www.desmos.com/calculator/8srsdmtxcz
+DTLOSS = 0.05  # Fraction of drivetrain loss. Rough value of 0.05 taken from:
+               # https://ridefar.info/bike/cycling-speed/mechanical-resistance/
+RHO = 1.22601  # kg/m^3 (air density) (default from gribble.org ...)
 
 # Other constants.
 G = 9.8067
-RHO = 1.225  # kg/m^3 (air density) (also this is not constant...)
 
 import sys
 
@@ -104,7 +107,7 @@ for track in gpx.tracks:
             if estimate >= breakpoints[-1][0] + breakpoint_freq:
                 breakpoints.append((estimate, distance))
 
-    print(f'distance: {distance / 1000:.2f}km')
+    print(f'distance: {distance / 1000:.1f}km')
     print(f'elevation gain: {elevation_gain:.0f}m')
     print(f'elevation loss: {elevation_loss:.0f}m')
 
@@ -127,7 +130,7 @@ for track in gpx.tracks:
     print('breakpoints:')
     for t, d in breakpoints[1:]:
         h, m = divmod(t // 60, 60)
-        print(f'{int(h):02}h{int(m):02}m -- {d / 1000:.2f}km')
+        print(f'{int(h):02}h{int(m):02}m -- {d / 1000:.1f}km')
 
     # NOTE currently only investigate the first track
     break
